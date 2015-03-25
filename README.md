@@ -4,7 +4,7 @@
 ``` mvn package ```
 
 ## Configuration properties file
-```
+```properties
 # MANDATORY PROPERTIES
 
 # zookeeper hosts and ports (eg: localhost:2181)
