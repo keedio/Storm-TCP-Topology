@@ -105,7 +105,7 @@ public class TCPBolt extends BaseRichBolt {
 				LOG.warn("Error establising TCP connection with host: "+host+" port: "+port);
 				try{			
 					Thread.sleep(retryDelay*1000);
-					if (retryDelay < 120)
+					if (retryDelay < 60)
 							retryDelay*=2;
 					continue;
 				}
