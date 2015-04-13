@@ -50,7 +50,7 @@ public class FilterMessageBolt implements IBasicBolt {
 		if (!allowMessages.isEmpty()){
 			Pattern patternAllow = Pattern.compile(allowMessages);
 			Matcher matcherAllow = patternAllow.matcher(message);
-			if (matcherAllow.matches()) {
+			if (matcherAllow.find()) {
 				LOG.debug("Emiting tuple(allowed): " + message.toString());
 				collector.emit(tuple(message));
 			}else{
@@ -61,7 +61,7 @@ public class FilterMessageBolt implements IBasicBolt {
 		else if (!denyMessages.isEmpty()){
 			Pattern patternDeny = Pattern.compile(denyMessages);
 			Matcher matcherDeny = patternDeny.matcher(message);
-			if (!matcherDeny.matches()) {
+			if (!matcherDeny.find()) {
 				LOG.debug("Emiting tuple(not denied): " + message.toString());
 				collector.emit(tuple(message));
 			}else

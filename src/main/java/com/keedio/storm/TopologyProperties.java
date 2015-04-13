@@ -2,6 +2,7 @@ package com.keedio.storm;
 
 import backtype.storm.Config;
 import backtype.storm.metric.LoggingMetricsConsumer;
+
 import com.keedio.storm.metric.JMXMetricConsumer;
 
 import java.io.FileInputStream;
@@ -28,6 +29,7 @@ public class TopologyProperties {
 			setProperties(fileName);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	
@@ -42,19 +44,28 @@ public class TopologyProperties {
 	private void setProperties(String fileName) throws Exception{
 		
 		Properties properties = readPropertiesFile(fileName);
-		topologyName = properties.getProperty("storm.topology.name","topologyName");
+		topologyName = properties.getProperty("storm.topology.name","defaultTopologyName");
 		localTimeExecution = Integer.parseInt(properties.getProperty("storm.local.execution.time","20000"));
+		
 		kafkaTopic = properties.getProperty("kafka.topic");
-		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning"));
+		if (kafkaTopic == null)
+			throw new ConfigurationException("Kafka topic must be specified in topology properties file");
+			
+		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning","false"));
 		setStormConfig(properties);
 	}
 
-	private void setStormConfig(Properties properties)
+	private void setStormConfig(Properties properties) throws ConfigurationException
 	{
 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
 		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","2"));
 		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
+		
 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
+		if (zookeeperHosts == null){
+			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
+		}
+		
 		int topologyBatchEmitMillis = Integer.parseInt(
 				properties.getProperty("storm.topology.batch.interval.miliseconds","2000"));
 		String nimbusHost = properties.getProperty("storm.nimbus.host","localhost");
@@ -72,9 +83,14 @@ public class TopologyProperties {
 		// Filter Messages Bolt properties
 		stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
 		stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
+		
 		// TCP bolt connection properties
-		stormConfig.put("tcp.bolt.host", properties.getProperty("tcp.bolt.host"));
-		stormConfig.put("tcp.bolt.port", properties.getProperty("tcp.bolt.port"));
+		String tcpHost = properties.getProperty("tcp.bolt.host");
+		String tcpPort =  properties.getProperty("tcp.bolt.port");
+		if (tcpHost == null || tcpPort == null)
+			throw new ConfigurationException("TCP destination Host and Port must be specified in topology properties file");
+		stormConfig.put("tcp.bolt.host", tcpHost);
+		stormConfig.put("tcp.bolt.port", tcpPort);
 
         // register metric consumer
         stormConfig.registerMetricsConsumer(JMXMetricConsumer.class, 1);
