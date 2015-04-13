@@ -56,4 +56,4 @@ storm.nimbus.host=streaming1
 
 ### Use
 Follow the usual way to run Storm Topologies:  
-```$ storm jar Storm-TCP-Topology-1.0.0.jar com/keedio/storm/StormSplunkTCPTopology <configuration-file>```
+```$ storm jar Storm-TCP-Topology-1.0.0.jar com/keedio/storm/StormTCPTopology <configuration-file>```
