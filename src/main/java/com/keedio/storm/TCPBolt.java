@@ -69,9 +69,13 @@ public class TCPBolt extends BaseRichBolt {
             throughputMetric.update(System.currentTimeMillis());
         } catch (SocketException se){
             errorCount.incr();
+            collector.reportError(se);
+            collector.fail(input);
 			LOG.error("Connection with server lost");
 			connectToHost();
 		} catch (IOException e) {
+			collector.reportError(e);
+			collector.fail(input);
             errorCount.incr();
 			e.printStackTrace();
 		}

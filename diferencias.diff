@@ -1,0 +1,186 @@
+diff --git a/pom.xml b/pom.xml
+index 7c436fd..67549c5 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -8,12 +8,12 @@
+ 		<dependency>
+ 			<groupId>org.apache.storm</groupId>
+ 			<artifactId>storm-core</artifactId>
+-			<version>0.9.2-incubating</version>
++			<version>0.9.4</version>
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>org.apache.storm</groupId>
+ 			<artifactId>storm-kafka</artifactId>
+-			<version>0.9.2-incubating</version>
++			<version>0.9.4</version>
+ 		</dependency>
+ 	</dependencies>
+ 	<build>
+diff --git a/src/main/java/com/keedio/storm/FilterMessageBolt.java b/src/main/java/com/keedio/storm/FilterMessageBolt.java
+index 13df6ac..93f344e 100644
+--- a/src/main/java/com/keedio/storm/FilterMessageBolt.java
++++ b/src/main/java/com/keedio/storm/FilterMessageBolt.java
+@@ -50,7 +50,7 @@ public class FilterMessageBolt implements IBasicBolt {
+ 		if (!allowMessages.isEmpty()){
+ 			Pattern patternAllow = Pattern.compile(allowMessages);
+ 			Matcher matcherAllow = patternAllow.matcher(message);
+-			if (matcherAllow.matches()) {
++			if (matcherAllow.find()) {
+ 				LOG.debug("Emiting tuple(allowed): " + message.toString());
+ 				collector.emit(tuple(message));
+ 			}else{
+@@ -61,7 +61,7 @@ public class FilterMessageBolt implements IBasicBolt {
+ 		else if (!denyMessages.isEmpty()){
+ 			Pattern patternDeny = Pattern.compile(denyMessages);
+ 			Matcher matcherDeny = patternDeny.matcher(message);
+-			if (!matcherDeny.matches()) {
++			if (!matcherDeny.find()) {
+ 				LOG.debug("Emiting tuple(not denied): " + message.toString());
+ 				collector.emit(tuple(message));
+ 			}else
+diff --git a/src/main/java/com/keedio/storm/TCPBolt.java b/src/main/java/com/keedio/storm/TCPBolt.java
+index 94b50e5..f142a8b 100644
+--- a/src/main/java/com/keedio/storm/TCPBolt.java
++++ b/src/main/java/com/keedio/storm/TCPBolt.java
+@@ -69,9 +69,13 @@ public class TCPBolt extends BaseRichBolt {
+             throughputMetric.update(System.currentTimeMillis());
+         } catch (SocketException se){
+             errorCount.incr();
++            collector.reportError(se);
++            collector.fail(input);
+ 			LOG.error("Connection with server lost");
+ 			connectToHost();
+ 		} catch (IOException e) {
++			collector.reportError(e);
++			collector.fail(input);
+             errorCount.incr();
+ 			e.printStackTrace();
+ 		}
+diff --git a/src/main/java/com/keedio/storm/TopologyProperties.java b/src/main/java/com/keedio/storm/TopologyProperties.java
+index 54afc11..38657c0 100644
+--- a/src/main/java/com/keedio/storm/TopologyProperties.java
++++ b/src/main/java/com/keedio/storm/TopologyProperties.java
+@@ -2,6 +2,7 @@ package com.keedio.storm;
+ 
+ import backtype.storm.Config;
+ import backtype.storm.metric.LoggingMetricsConsumer;
++
+ import com.keedio.storm.metric.JMXMetricConsumer;
+ 
+ import java.io.FileInputStream;
+@@ -28,6 +29,7 @@ public class TopologyProperties {
+ 			setProperties(fileName);
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
++			System.exit(1);
+ 		}
+ 	}
+ 	
+@@ -42,19 +44,28 @@ public class TopologyProperties {
+ 	private void setProperties(String fileName) throws Exception{
+ 		
+ 		Properties properties = readPropertiesFile(fileName);
+-		topologyName = properties.getProperty("storm.topology.name","topologyName");
++		topologyName = properties.getProperty("storm.topology.name","defaultTopologyName");
+ 		localTimeExecution = Integer.parseInt(properties.getProperty("storm.local.execution.time","20000"));
++		
+ 		kafkaTopic = properties.getProperty("kafka.topic");
+-		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning"));
++		if (kafkaTopic == null)
++			throw new ConfigurationException("Kafka topic must be specified in topology properties file");
++			
++		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning","false"));
+ 		setStormConfig(properties);
+ 	}
+ 
+-	private void setStormConfig(Properties properties)
++	private void setStormConfig(Properties properties) throws ConfigurationException
+ 	{
+ 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
+ 		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","2"));
+ 		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
++		
+ 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
++		if (zookeeperHosts == null){
++			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
++		}
++		
+ 		int topologyBatchEmitMillis = Integer.parseInt(
+ 				properties.getProperty("storm.topology.batch.interval.miliseconds","2000"));
+ 		String nimbusHost = properties.getProperty("storm.nimbus.host","localhost");
+@@ -72,9 +83,14 @@ public class TopologyProperties {
+ 		// Filter Messages Bolt properties
+ 		stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
+ 		stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
++		
+ 		// TCP bolt connection properties
+-		stormConfig.put("tcp.bolt.host", properties.getProperty("tcp.bolt.host"));
+-		stormConfig.put("tcp.bolt.port", properties.getProperty("tcp.bolt.port"));
++		String tcpHost = properties.getProperty("tcp.bolt.host");
++		String tcpPort =  properties.getProperty("tcp.bolt.port");
++		if (tcpHost == null || tcpPort == null)
++			throw new ConfigurationException("TCP destination Host and Port must be specified in topology properties file");
++		stormConfig.put("tcp.bolt.host", tcpHost);
++		stormConfig.put("tcp.bolt.port", tcpPort);
+ 
+         // register metric consumer
+         stormConfig.registerMetricsConsumer(JMXMetricConsumer.class, 1);
+diff --git a/src/main/resources/storm-siem-topology.config.properties b/src/main/resources/storm-siem-topology.config.properties
+index 56d6145..95516ce 100644
+--- a/src/main/resources/storm-siem-topology.config.properties
++++ b/src/main/resources/storm-siem-topology.config.properties
+@@ -1,11 +1,13 @@
+ ﻿# MANDATORY PROPERTIES
+ 
+ 
+-# zookeeper hosts and ports (eg: host1:2181,host2:2181)
+-zookeeper.hosts=host1:2181,host2:2181
++# zookeeper hosts and ports (eg: localhost:2181)
++# zookeeper.hosts=vmwtbobrmp01:2181,vmwtbobnnp01:2181,vmwtbobnnp02:2181
++#zookeeper.hosts=22.0.6.32:2181,22.0.6.33:2181,22.0.6.34:2181
++zookeeper.hosts=localhost:2181
+ 
+ # kafka topic for read messages
+-kafka.topic=topic
++kafka.topic=infinito
+ kafka.startFromBeginning=false
+ 
+ 
+@@ -15,6 +17,7 @@ kafka.startFromBeginning=false
+ 
+ 
+ # Splunk tcp properties
++#tcp.bolt.host=vmwtbobrmp01
+ tcp.bolt.host=localhost
+ tcp.bolt.port=2100
+ 
+@@ -34,16 +37,16 @@ tcp.bolt.port=2100
+ storm.execution.mode=local
+ 
+ 
+-# Storm Topology Name (default defaultTopologyName)
+-storm.topology.name=topologyName
++# Storm Topology Name (default AuditActiveLoginsCount)
++storm.topology.name=SIEM-UK-REGEX-2
+ 
+ 
+ # Storm batch emmit interval (default 2000)
+ #storm.topology.batch.interval.miliseconds
+ 
+ 
+-# Time of topology execution, in miliseconds (only in local mode, default 20000, infinite -1)
+-storm.local.execution.time=120000
++# Time of topology execution, in miliseconds (only in local mode, default 20000)
++storm.local.execution.time=1200000
+ 
+ 
+ # CLUSTER PROPERTIES:
+@@ -54,5 +57,4 @@ storm.nimbus.host=localhost
+ # Storm Nimbus port (default 6627)
+ # storm.nimbus.port
+ 
+-# Kafka spout max queued messages
+-topology.max.spout.pending=1024
++topology.max.spout.pending=1024
+\ No newline at end of file
