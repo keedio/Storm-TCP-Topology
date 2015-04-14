@@ -83,6 +83,7 @@ public class TopologyProperties {
 		// Filter Messages Bolt properties
 		stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
 		stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
+		stormConfig.put("metrics.reporter.yammer.facade..metric.bucket.seconds", properties.getProperty("metrics.reporter.yammer.facade..metric.bucket.seconds"));
 		
 		// TCP bolt connection properties
 		String tcpHost = properties.getProperty("tcp.bolt.host");

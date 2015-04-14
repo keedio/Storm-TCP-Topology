@@ -11,6 +11,16 @@
 			<version>0.9.4</version>
 		</dependency>
 		<dependency>
+			<groupId>org.keedio.bolt</groupId>
+			<artifactId>storm-tcp-bolt</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.keedio.bolt</groupId>
+			<artifactId>storm-filterregex-bolt</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-kafka</artifactId>
 			<version>0.9.4</version>
