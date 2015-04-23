@@ -55,7 +55,7 @@ public class StormSplunkTCPTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), 4);
 		builder.setBolt("FilterBolt", new FilterMessageBolt(),1).shuffleGrouping("KafkaSpout");
-		builder.setBolt("SplunkTCPBolt", new TCPBolt(), 1).shuffleGrouping("FilterBolt");
+		builder.setBolt("SplunkTCPBolt", new TCPBolt(), 1).shuffleGrouping("KafkaSpout");
 
 		return builder.createTopology();
 	}
