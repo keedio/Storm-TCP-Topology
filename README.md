@@ -10,7 +10,7 @@ mvn clean package
 
 ## Dependecies
 This project depends on next projects:
-* [XmlWinEvent](https://github.com/keedio/XMLWinEvent)
+* [storm-filterregex-bolt](https://github.com/keedio/storm-filterregex-bolt)
 * [storm-tcp-bolt](https://github.com/keedio/storm-tcp-bolt)
 
 Configuration properties
