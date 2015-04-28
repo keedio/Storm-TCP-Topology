@@ -14,7 +14,7 @@ public class TopologyProperties {
 	
 	private String kafkaTopic;
 	private String topologyName;
-	private int localTimeExecution;
+	private int localTimeExecution, kafkaSpoutParallelism, filterBoltParallelism, tcpBoltParallelism;
 	private Config stormConfig;
 	private String zookeeperHosts;
 	private String stormExecutionMode;
@@ -46,20 +46,27 @@ public class TopologyProperties {
 		Properties properties = readPropertiesFile(fileName);
 		topologyName = properties.getProperty("storm.topology.name","defaultTopologyName");
 		localTimeExecution = Integer.parseInt(properties.getProperty("storm.local.execution.time","20000"));
+		kafkaSpoutParallelism = Integer.parseInt(properties.getProperty("kafka.spout.paralellism","1"));
+		filterBoltParallelism = Integer.parseInt(properties.getProperty("filter.bolt.paralellism","1"));
+		tcpBoltParallelism = Integer.parseInt(properties.getProperty("tcp.bolt.paralellism","1"));
+		
 		
 		kafkaTopic = properties.getProperty("kafka.topic");
 		if (kafkaTopic == null)
 			throw new ConfigurationException("Kafka topic must be specified in topology properties file");
 			
 		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning","false"));
+		
+		
+		
 		setStormConfig(properties);
 	}
 
 	private void setStormConfig(Properties properties) throws ConfigurationException
 	{
 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
-		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","2"));
-		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
+		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","1"));
+		//int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
 		
 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
 		if (zookeeperHosts == null){
@@ -74,7 +81,7 @@ public class TopologyProperties {
 		// How often a batch can be emitted in a Trident topology.
 		stormConfig.put(Config.TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS, topologyBatchEmitMillis);
 		stormConfig.setNumWorkers(stormWorkersNumber);
-		stormConfig.setMaxTaskParallelism(maxTaskParallism);
+		//stormConfig.setMaxTaskParallelism(maxTaskParallism);
 		// Storm cluster specific properties
 		stormConfig.put(Config.NIMBUS_HOST, nimbusHost);
 		stormConfig.put(Config.NIMBUS_THRIFT_PORT, Integer.parseInt(nimbusPort));
@@ -141,5 +148,17 @@ public class TopologyProperties {
 	
 	public boolean isKafkaStartFromBeginning() {
 		return kafkaStartFromBeginning;
+	}
+
+	public int getKafkaSpoutParallelism() {
+		return kafkaSpoutParallelism;
+	}
+
+	public int getFilterBoltParallelism() {
+		return filterBoltParallelism;
+	}
+
+	public int getTcpBoltParallelism() {
+		return tcpBoltParallelism;
 	}	
 }

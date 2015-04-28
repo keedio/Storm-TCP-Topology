@@ -50,7 +50,7 @@ public class TCPBolt extends BaseRichBolt {
         this.throughputMetric = new ReducedMetric(new ThroughputReducer());
         this.errorCount = new CountMetric();
         context.registerMetric("throughputMetric", throughputMetric, 5);
-        context.registerMetric("errorCountMetric", errorCount, 5);
+        context.registerMetric("errorCountMetric", errorCount, 5);   
 	}
 
 	@Override
