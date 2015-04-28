@@ -1,6 +1,6 @@
 # Storm-TCP-Topology
 ## Description
-Storm topology consuming JSON kafka messages, it performs message filtering (both vertical and horizontal) and finally publishes to Splunk (via TCP communications port to the host and indicated).
+Storm topology consuming JSON kafka messages; it performs message filtering (both vertical and horizontal) and finally publishes to Splunk (via TCP communications to configured host and port).
 
 ## Compilation
 
