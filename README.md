@@ -12,6 +12,7 @@ mvn clean package
 This project depends on next projects:
 * [storm-filterregex-bolt](https://github.com/keedio/storm-filterregex-bolt)
 * [storm-tcp-bolt](https://github.com/keedio/storm-tcp-bolt)
+* [metrics-core](https://github.com/dropwizard/metrics)
 
 Configuration properties
 
@@ -77,3 +78,4 @@ In order to install this topology you have to copy next libs to the storm lib di
 * Storm-TCP-Topology.XXX.jar
 * storm-filterregex-bolt.XXX.jar
 * storm-tcp-bolt.XXX.jar
+* metrics-core.jar
