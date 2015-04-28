@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Storm-TCP-Topology</groupId>
 	<artifactId>Storm-TCP-Topology</artifactId>
-	<version>1.1.2-SNAPSHOT</version>
+	<version>1.1.2</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.storm</groupId>
