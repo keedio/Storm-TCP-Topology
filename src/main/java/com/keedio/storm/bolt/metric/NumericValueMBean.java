@@ -1,4 +1,4 @@
-package com.keedio.storm.metric;
+package com.keedio.storm.bolt.metric;
 
 /**
  * MBean interface for the numeric value wrapper class.

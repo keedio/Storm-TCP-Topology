@@ -13,13 +13,13 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 
 
-public class StormSplunkTCPTopology {
+public class StormTCPTopology {
 	public static final Logger LOG = LoggerFactory
-			.getLogger(StormSplunkTCPTopology.class);
+			.getLogger(StormTCPTopology.class);
 
 	private final TopologyProperties topologyProperties;
 
-	public StormSplunkTCPTopology(TopologyProperties topologyProperties) {
+	public StormTCPTopology(TopologyProperties topologyProperties) {
 		this.topologyProperties = topologyProperties;
 	}
 	
@@ -47,7 +47,7 @@ public class StormSplunkTCPTopology {
 	{
 		BrokerHosts kafkaBrokerHosts = new ZkHosts(topologyProperties.getZookeeperHosts());
 		String kafkaTopic = topologyProperties.getKafkaTopic();
-		SpoutConfig kafkaConfig = new SpoutConfig(kafkaBrokerHosts, kafkaTopic, "/storm/kafka",	kafkaTopic);
+		SpoutConfig kafkaConfig = new SpoutConfig(kafkaBrokerHosts, kafkaTopic, "/storm/kafka/"+topologyProperties.getTopologyName(), kafkaTopic);
 		kafkaConfig.forceFromStart = topologyProperties.isKafkaStartFromBeginning();
 		
 		// NOTE: This is for avoid a bug in kafka storm config default value
@@ -62,9 +62,8 @@ public class StormSplunkTCPTopology {
 	
 	public static void main(String[] args) throws Exception {
 		String propertiesFile = args[0];
-		System.out.println(propertiesFile);
 		TopologyProperties topologyProperties = new TopologyProperties(propertiesFile);
-		StormSplunkTCPTopology topology = new StormSplunkTCPTopology(topologyProperties);
+		StormTCPTopology topology = new StormTCPTopology(topologyProperties);
 		topology.runTopology();
 	}
 }

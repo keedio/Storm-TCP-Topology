@@ -1,4 +1,4 @@
-package com.keedio.storm.metric;
+package com.keedio.storm.bolt.metric;
 
 /**
  * Wrapper class for any numeric value to be published via JMX.

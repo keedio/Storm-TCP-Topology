@@ -3,17 +3,42 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Storm-TCP-Topology</groupId>
 	<artifactId>Storm-TCP-Topology</artifactId>
-	<version>1.0.0</version>
+	<version>2.0.0</version>
 	<dependencies>
+    <dependency>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>3.1.1</version>
+    </dependency>
+		<dependency>
+			<groupId>org.keedio.bolt</groupId>
+			<artifactId>storm-tcp-bolt</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+                <dependency>
+        		<groupId>org.keedio.bolt</groupId>
+        		<artifactId>storm-filterregex-bolt</artifactId>
+		        <version>1.0.1-SNAPSHOT</version>
+                </dependency>
 		<dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-core</artifactId>
-			<version>0.9.2-incubating</version>
+			<version>0.9.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.keedio.bolt</groupId>
+			<artifactId>storm-tcp-bolt</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.keedio.bolt</groupId>
+			<artifactId>storm-filterregex-bolt</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-kafka</artifactId>
-			<version>0.9.2-incubating</version>
+			<version>0.9.4</version>
 		</dependency>
 	</dependencies>
 	<build>
