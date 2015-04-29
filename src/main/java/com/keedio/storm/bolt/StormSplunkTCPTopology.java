@@ -1,8 +1,9 @@
-package com.keedio.storm;
+package com.keedio.storm.bolt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.keedio.storm.bolt.FilterMessageBolt;
+import com.keedio.storm.bolt.TCPBolt;
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
@@ -55,7 +56,7 @@ public class StormSplunkTCPTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), 4);
 		builder.setBolt("FilterBolt", new FilterMessageBolt(),1).shuffleGrouping("KafkaSpout");
-		builder.setBolt("SplunkTCPBolt", new TCPBolt(), 1).shuffleGrouping("FilterBolt");
+		builder.setBolt("SplunkTCPBolt", new TCPBolt(), 1).shuffleGrouping("KafkaSpout");
 
 		return builder.createTopology();
 	}

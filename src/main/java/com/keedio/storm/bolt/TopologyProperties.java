@@ -1,12 +1,11 @@
-package com.keedio.storm;
+package com.keedio.storm.bolt;
 
 import backtype.storm.Config;
 import backtype.storm.metric.LoggingMetricsConsumer;
-
-import com.keedio.storm.metric.JMXMetricConsumer;
-
+import com.keedio.storm.bolt.metric.JMXMetricConsumer;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -14,12 +13,12 @@ public class TopologyProperties {
 	
 	private String kafkaTopic;
 	private String topologyName;
-	private int localTimeExecution;
+	private int localTimeExecution, kafkaSpoutParallelism, filterBoltParallelism, tcpBoltParallelism;
 	private Config stormConfig;
 	private String zookeeperHosts;
 	private String stormExecutionMode;
 	private boolean kafkaStartFromBeginning;
-
+	private String jsonFilter;
 
 	public TopologyProperties(String fileName){
 		
@@ -46,6 +45,9 @@ public class TopologyProperties {
 		Properties properties = readPropertiesFile(fileName);
 		topologyName = properties.getProperty("storm.topology.name","defaultTopologyName");
 		localTimeExecution = Integer.parseInt(properties.getProperty("storm.local.execution.time","20000"));
+		kafkaSpoutParallelism = Integer.parseInt(properties.getProperty("kafka.spout.paralellism","1"));
+		filterBoltParallelism = Integer.parseInt(properties.getProperty("filter.bolt.paralellism","1"));
+		tcpBoltParallelism = Integer.parseInt(properties.getProperty("tcp.bolt.paralellism","1"));
 		
 		kafkaTopic = properties.getProperty("kafka.topic");
 		if (kafkaTopic == null)
@@ -57,8 +59,24 @@ public class TopologyProperties {
 
 	private void setStormConfig(Properties properties) throws ConfigurationException
 	{
+
+		Iterator it = properties.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String)it.next();
+			String value = (String)properties.get(key);
+			
+			stormConfig.put(key, value);
+		}
 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
-		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","2"));
+		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","1"));
+		//int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
+		
+		zookeeperHosts = properties.getProperty("zookeeper.hosts");
+		if (zookeeperHosts == null){
+			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
+		}
+		
+		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
 		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
 		
 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
@@ -81,20 +99,24 @@ public class TopologyProperties {
 		stormConfig.put(Config.STORM_ZOOKEEPER_PORT, parseZkPort(zookeeperHosts));
 		stormConfig.put(Config.STORM_ZOOKEEPER_SERVERS, parseZkHosts(zookeeperHosts));
 		// Filter Messages Bolt properties
-		stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
-		stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
-		stormConfig.put("metrics.reporter.yammer.facade..metric.bucket.seconds", properties.getProperty("metrics.reporter.yammer.facade..metric.bucket.seconds"));
-		
 		// TCP bolt connection properties
+		//stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
+		//stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
+		// TCP bolt connection properties
+		//stormConfig.put("tcp.bolt.host", properties.getProperty("tcp.bolt.host"));
+		//stormConfig.put("tcp.bolt.port", properties.getProperty("tcp.bolt.port"));
+		//stormConfig.put("metrics.reporter.yammer.facade..metric.bucket.seconds", properties.getProperty("metrics.reporter.yammer.facade..metric.bucket.seconds"));
+		//stormConfig.put("group.separator", properties.getProperty("group.separator"));
+		//stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
+		//stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
 		String tcpHost = properties.getProperty("tcp.bolt.host");
 		String tcpPort =  properties.getProperty("tcp.bolt.port");
 		if (tcpHost == null || tcpPort == null)
 			throw new ConfigurationException("TCP destination Host and Port must be specified in topology properties file");
-		stormConfig.put("tcp.bolt.host", tcpHost);
-		stormConfig.put("tcp.bolt.port", tcpPort);
 
+		
         // register metric consumer
-        stormConfig.registerMetricsConsumer(JMXMetricConsumer.class, 1);
+        //stormConfig.registerMetricsConsumer(JMXMetricConsumer.class, 1);
         stormConfig.registerMetricsConsumer(LoggingMetricsConsumer.class, 1);
 	}
 
@@ -142,5 +164,17 @@ public class TopologyProperties {
 	
 	public boolean isKafkaStartFromBeginning() {
 		return kafkaStartFromBeginning;
+	}
+
+	public int getKafkaSpoutParallelism() {
+		return kafkaSpoutParallelism;
+	}
+
+	public int getFilterBoltParallelism() {
+		return filterBoltParallelism;
+	}
+
+	public int getTcpBoltParallelism() {
+		return tcpBoltParallelism;
 	}	
 }
