@@ -1,10 +1,22 @@
-### Storm-TCP-Topology
+# Storm-TCP-Topology
+## Description
+Storm topology consuming JSON kafka messages; it performs message filtering (both vertical and horizontal) and finally publishes to Splunk (via TCP communications to configured host and port).
 
 ## Compilation
-``` mvn package ```
 
-## Configuration properties file
-```properties
+```
+mvn clean package
+````
+
+## Dependecies
+This project depends on next projects:
+* [storm-filterregex-bolt](https://github.com/keedio/storm-filterregex-bolt)
+* [storm-tcp-bolt](https://github.com/keedio/storm-tcp-bolt)
+* [metrics-core](https://github.com/dropwizard/metrics)
+
+Configuration properties
+
+```
 # MANDATORY PROPERTIES
 
 # zookeeper hosts and ports (eg: localhost:2181)
@@ -52,8 +64,18 @@ storm.nimbus.host=streaming1
 
 # Storm Nimbus port (default 6627)
 # storm.nimbus.port
+
+#Bolt filtrado
+filter.bolt.allow
+filter.bolt.deny
+conf.pattern1=(<date>[^\\s]+)\\s+(<time>[^\\s]+)\\s+
+conf.pattern2=(<date>[^\\s]+)\\s+
+group.separator=|
 ```
 
-### Use
-Follow the usual way to run Storm Topologies:  
-```$ storm jar Storm-TCP-Topology-1.0.0.jar com/keedio/storm/StormTCPTopology <configuration-file>```
+## Deploy
+In order to install this topology you have to copy next libs to the storm lib directory:
+* Storm-TCP-Topology.XXX.jar
+* storm-filterregex-bolt.XXX.jar
+* storm-tcp-bolt.XXX.jar
+* metrics-core.jar
