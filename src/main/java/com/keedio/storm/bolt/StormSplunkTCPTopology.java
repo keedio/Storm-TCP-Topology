@@ -1,8 +1,9 @@
-package com.keedio.storm;
+package com.keedio.storm.bolt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.keedio.storm.bolt.FilterMessageBolt;
+import com.keedio.storm.bolt.TCPBolt;
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;

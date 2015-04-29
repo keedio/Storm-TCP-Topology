@@ -1,10 +1,8 @@
-package com.keedio.storm;
+package com.keedio.storm.bolt;
 
 import backtype.storm.Config;
 import backtype.storm.metric.LoggingMetricsConsumer;
-
-import com.keedio.storm.metric.JMXMetricConsumer;
-
+import com.keedio.storm.bolt.metric.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +13,7 @@ public class TopologyProperties {
 	
 	private String kafkaTopic;
 	private String topologyName;
-	private int localTimeExecution;
+	private int localTimeExecution, kafkaSpoutParallelism, filterBoltParallelism, tcpBoltParallelism;
 	private Config stormConfig;
 	private String zookeeperHosts;
 	private String stormExecutionMode;
@@ -30,6 +28,7 @@ public class TopologyProperties {
 			setProperties(fileName);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	
@@ -44,14 +43,25 @@ public class TopologyProperties {
 	private void setProperties(String fileName) throws Exception{
 		
 		Properties properties = readPropertiesFile(fileName);
-		topologyName = properties.getProperty("storm.topology.name","topologyName");
+		topologyName = properties.getProperty("storm.topology.name","defaultTopologyName");
 		localTimeExecution = Integer.parseInt(properties.getProperty("storm.local.execution.time","20000"));
+		kafkaSpoutParallelism = Integer.parseInt(properties.getProperty("kafka.spout.paralellism","1"));
+		filterBoltParallelism = Integer.parseInt(properties.getProperty("filter.bolt.paralellism","1"));
+		tcpBoltParallelism = Integer.parseInt(properties.getProperty("tcp.bolt.paralellism","1"));
+		
+		
 		kafkaTopic = properties.getProperty("kafka.topic");
-		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning"));
+		if (kafkaTopic == null)
+			throw new ConfigurationException("Kafka topic must be specified in topology properties file");
+			
+		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning","false"));
+		
+		
+		
 		setStormConfig(properties);
 	}
 
-	private void setStormConfig(Properties properties)
+	private void setStormConfig(Properties properties) throws ConfigurationException
 	{
 
 		Iterator it = properties.keySet().iterator();
@@ -61,9 +71,16 @@ public class TopologyProperties {
 			
 			stormConfig.put(key, value);
 		}
+		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
+		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","1"));
+		//int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
+		
+		zookeeperHosts = properties.getProperty("zookeeper.hosts");
+		if (zookeeperHosts == null){
+			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
+		}
 		
 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
-		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","2"));
 		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
 		int topologyBatchEmitMillis = Integer.parseInt(
@@ -90,6 +107,10 @@ public class TopologyProperties {
 		//stormConfig.put("group.separator", properties.getProperty("group.separator"));
 		//stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
 		//stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
+		String tcpHost = properties.getProperty("tcp.bolt.host");
+		String tcpPort =  properties.getProperty("tcp.bolt.port");
+		if (tcpHost == null || tcpPort == null)
+			throw new ConfigurationException("TCP destination Host and Port must be specified in topology properties file");
 
 		
         // register metric consumer
@@ -141,5 +162,17 @@ public class TopologyProperties {
 	
 	public boolean isKafkaStartFromBeginning() {
 		return kafkaStartFromBeginning;
+	}
+
+	public int getKafkaSpoutParallelism() {
+		return kafkaSpoutParallelism;
+	}
+
+	public int getFilterBoltParallelism() {
+		return filterBoltParallelism;
+	}
+
+	public int getTcpBoltParallelism() {
+		return tcpBoltParallelism;
 	}	
 }

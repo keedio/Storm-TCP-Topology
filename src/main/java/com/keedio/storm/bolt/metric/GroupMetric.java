@@ -1,4 +1,4 @@
-package com.keedio.storm.metric;
+package com.keedio.storm.bolt.metric;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
