@@ -2,6 +2,10 @@
 ## Description
 Storm topology consuming JSON kafka messages; it performs message filtering (both vertical and horizontal) and finally publishes to Splunk (via TCP communications to configured host and port).
 
+This topology consumes messages with next format:
+```
+{"extraData":"fsfsdf","message":"adios amigo <date>11-23-24  <time>22:22:22 sflhsldfjs"}
+```
 ## Compilation
 
 ```
