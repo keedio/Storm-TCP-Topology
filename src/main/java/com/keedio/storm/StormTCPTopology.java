@@ -1,5 +1,6 @@
 package com.keedio.storm;
 
+import com.keedio.storm.bolt.FilterMessageBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +50,11 @@ public class StormTCPTopology {
 		String kafkaTopic = topologyProperties.getKafkaTopic();
 		SpoutConfig kafkaConfig = new SpoutConfig(kafkaBrokerHosts, kafkaTopic, "/storm/kafka/"+topologyProperties.getTopologyName(), kafkaTopic);
 		kafkaConfig.forceFromStart = topologyProperties.isKafkaStartFromBeginning();
-		
-		// NOTE: This is for avoid a bug in kafka storm config default value
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), 4);
-		builder.setBolt("FilterBolt", new FilterMessageBolt(),1).shuffleGrouping("KafkaSpout");
-		builder.setBolt("SplunkTCPBolt", new TCPBolt(), 1).shuffleGrouping("FilterBolt");
+		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), topologyProperties.getKafkaSpoutParallelism());
+		builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
+		builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterBolt");
 
 		return builder.createTopology();
 	}
