@@ -1,9 +1,9 @@
-package com.keedio.storm.bolt;
+package com.keedio.storm;
 
+import com.keedio.storm.bolt.FilterMessageBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.keedio.storm.bolt.FilterMessageBolt;
-import com.keedio.storm.bolt.TCPBolt;
+
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
@@ -14,13 +14,13 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 
 
-public class StormSplunkTCPTopology {
+public class StormTCPTopology {
 	public static final Logger LOG = LoggerFactory
-			.getLogger(StormSplunkTCPTopology.class);
+			.getLogger(StormTCPTopology.class);
 
 	private final TopologyProperties topologyProperties;
 
-	public StormSplunkTCPTopology(TopologyProperties topologyProperties) {
+	public StormTCPTopology(TopologyProperties topologyProperties) {
 		this.topologyProperties = topologyProperties;
 	}
 	
@@ -62,7 +62,7 @@ public class StormSplunkTCPTopology {
 	public static void main(String[] args) throws Exception {
 		String propertiesFile = args[0];
 		TopologyProperties topologyProperties = new TopologyProperties(propertiesFile);
-		StormSplunkTCPTopology topology = new StormSplunkTCPTopology(topologyProperties);
+		StormTCPTopology topology = new StormTCPTopology(topologyProperties);
 		topology.runTopology();
 	}
 }

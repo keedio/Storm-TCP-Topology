@@ -1,8 +1,8 @@
-package com.keedio.storm.bolt;
+package com.keedio.storm;
 
 import backtype.storm.Config;
 import backtype.storm.metric.LoggingMetricsConsumer;
-import com.keedio.storm.bolt.metric.JMXMetricConsumer;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,17 +72,8 @@ public class TopologyProperties {
 		}
 		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
 		int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number","1"));
-		//int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
-		
-		zookeeperHosts = properties.getProperty("zookeeper.hosts");
-		if (zookeeperHosts == null){
-			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
-		}
-		
-		stormExecutionMode = properties.getProperty("storm.execution.mode","local");
 		int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
-		//int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism","2"));
-		
+
 		zookeeperHosts = properties.getProperty("zookeeper.hosts");
 		if (zookeeperHosts == null){
 			throw new ConfigurationException("Zookeeper hosts must be specified in configuration file");
