@@ -1,6 +1,7 @@
 package com.keedio.storm;
 
-import com.keedio.storm.bolt.FilterMessageBolt;
+import org.keedio.storm.bolt.filter.FilterMessageBolt;
+import org.keedio.storm.bolt.tcp.TCPBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
