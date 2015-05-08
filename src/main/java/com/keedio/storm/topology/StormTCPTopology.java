@@ -1,4 +1,4 @@
-package com.keedio.storm;
+package com.keedio.storm.topology;
 
 import org.keedio.storm.bolt.filter.FilterMessageBolt;
 import org.keedio.storm.bolt.tcp.TCPBolt;

@@ -1,4 +1,4 @@
-package com.keedio.storm;
+package com.keedio.storm.topology;
 
 import backtype.storm.Config;
 import backtype.storm.metric.LoggingMetricsConsumer;
