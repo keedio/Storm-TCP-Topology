@@ -13,12 +13,12 @@
         <dependency>
             <groupId>org.keedio.storm.bolt.tcp</groupId>
             <artifactId>storm-tcp-bolt</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.keedio.storm.bolt.filter</groupId>
             <artifactId>storm-filterregex-bolt</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.storm</groupId>
