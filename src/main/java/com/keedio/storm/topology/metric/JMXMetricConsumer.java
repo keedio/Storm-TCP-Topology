@@ -1,4 +1,4 @@
-package com.keedio.storm.metric;
+package com.keedio.storm.topology.metric;
 
 import backtype.storm.metric.api.IMetricsConsumer;
 import backtype.storm.task.IErrorReporter;

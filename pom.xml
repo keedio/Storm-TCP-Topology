@@ -1,67 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-<<<<<<< HEAD
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>Storm-TCP-Topology</groupId>
-	<artifactId>Storm-TCP-Topology</artifactId>
-	<version>2.0.0</version>
-	<dependencies>
-    <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-core</artifactId>
-        <version>3.1.1</version>
-    </dependency>
-		<dependency>
-			<groupId>org.keedio.bolt</groupId>
-			<artifactId>storm-tcp-bolt</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-                <dependency>
-        		<groupId>org.keedio.bolt</groupId>
-        		<artifactId>storm-filterregex-bolt</artifactId>
-		        <version>1.0.1-SNAPSHOT</version>
-                </dependency>
-		<dependency>
-			<groupId>org.apache.storm</groupId>
-			<artifactId>storm-core</artifactId>
-			<version>0.9.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.keedio.bolt</groupId>
-			<artifactId>storm-tcp-bolt</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.keedio.bolt</groupId>
-			<artifactId>storm-filterregex-bolt</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.storm</groupId>
-			<artifactId>storm-kafka</artifactId>
-			<version>0.9.4</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-=======
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>Storm-TCP-Topology</groupId>
+    <groupId>com.keedio.storm.topology.tcp</groupId>
     <artifactId>Storm-TCP-Topology</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -69,14 +11,14 @@
             <version>3.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.keedio.bolt</groupId>
+            <groupId>org.keedio.storm.bolt.tcp</groupId>
             <artifactId>storm-tcp-bolt</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>org.keedio.bolt</groupId>
+            <groupId>org.keedio.storm.bolt.filter</groupId>
             <artifactId>storm-filterregex-bolt</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.storm</groupId>
@@ -103,5 +45,4 @@
             </plugin>
         </plugins>
     </build>
->>>>>>> release/2.0.1
 </project>
