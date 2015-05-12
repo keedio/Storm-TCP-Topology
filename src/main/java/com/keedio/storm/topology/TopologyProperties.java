@@ -54,6 +54,9 @@ public class TopologyProperties {
 			throw new ConfigurationException("Kafka topic must be specified in topology properties file");
 			
 		kafkaStartFromBeginning = new Boolean(properties.getProperty("kafka.startFromBeginning","false"));
+		
+		
+		
 		setStormConfig(properties);
 	}
 
@@ -84,7 +87,7 @@ public class TopologyProperties {
 		// How often a batch can be emitted in a Trident topology.
 		stormConfig.put(Config.TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS, topologyBatchEmitMillis);
 		stormConfig.setNumWorkers(stormWorkersNumber);
-		stormConfig.setMaxTaskParallelism(maxTaskParallism);
+		//stormConfig.setMaxTaskParallelism(maxTaskParallism);
 		// Storm cluster specific properties
 		stormConfig.put(Config.NIMBUS_HOST, nimbusHost);
 		stormConfig.put(Config.NIMBUS_THRIFT_PORT, Integer.parseInt(nimbusPort));
