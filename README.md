@@ -74,12 +74,8 @@ filter.bolt.allow
 filter.bolt.deny
 conf.pattern1=(<date>[^\\s]+)\\s+(<time>[^\\s]+)\\s+
 conf.pattern2=(<date>[^\\s]+)\\s+
-group.separator=|
 ```
 
 ## Deploy
 In order to install this topology you have to copy next libs to the storm lib directory:
 * Storm-TCP-Topology.XXX.jar
-* storm-filterregex-bolt.XXX.jar
-* storm-tcp-bolt.XXX.jar
-* metrics-core.jar
