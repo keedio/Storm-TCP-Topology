@@ -2,6 +2,8 @@ package com.keedio.storm.topology;
 
 import org.keedio.storm.bolt.filter.FilterMessageBolt;
 import org.keedio.storm.bolt.tcp.TCPBolt;
+import org.keedio.storm.filterkey.bolt.FilterkeyBolt;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +57,9 @@ public class StormTCPTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), topologyProperties.getKafkaSpoutParallelism());
 		builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
+                builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("FilterBolt");
 		builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterBolt");
-
+                
 		return builder.createTopology();
 	}
 	

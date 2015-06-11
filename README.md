@@ -16,6 +16,7 @@ mvn clean package
 This project depends on next projects:
 * [storm-filterregex-bolt](https://github.com/keedio/storm-filterregex-bolt)
 * [storm-tcp-bolt](https://github.com/keedio/storm-tcp-bolt)
+* [storm-filterkey-bolt] (https://github.com/keedio/Storm-filterkey-bolt)
 * [metrics-core](https://github.com/dropwizard/metrics)
 
 Configuration properties
@@ -61,6 +62,8 @@ storm.topology.name=Topology-Name
 # Time of topology execution, in miliseconds (only in local mode, default 20000)
 storm.local.execution.time=1200000
 
+# Filter extradata of message according maps of keys ([storm-filterkey-bolt] (https://github.com/keedio/Storm-filterkey-bolt))
+ key.selection.criteria.1 = {"key":{"Field1":"value1"},"values":["Field2","Field3"]}"} 
 
 # CLUSTER PROPERTIES:
 # Storm Nimbus host (default localhost)
@@ -79,3 +82,6 @@ conf.pattern2=(<date>[^\\s]+)\\s+
 ## Deploy
 In order to install this topology you have to copy next libs to the storm lib directory:
 * Storm-TCP-Topology.XXX.jar
+
+## Version history
+2.0.5 added bolt filterkey map to topology.
