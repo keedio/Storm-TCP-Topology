@@ -36,6 +36,9 @@ kafka.startFromBeginning=true
 tcp.bolt.host=tcpHost
 tcp.bolt.port=2000
 
+# Reporting 
+ganglia.report = no
+
 # OPTIONAL PROPERTIES
 
 # Filter messages rules, regexp expression are used
@@ -77,6 +80,15 @@ filter.bolt.allow
 filter.bolt.deny
 conf.pattern1=(<date>[^\\s]+)\\s+(<time>[^\\s]+)\\s+
 conf.pattern2=(<date>[^\\s]+)\\s+
+
+
+# if Ganglia reporting is needed:
+ganglia.report = true
+ganglia.host = localhost
+ganglia.port = 5555
+ganglia.ttl = 1
+ganglia.UDPAddressingMode = (UNICAST | MULTICAST)
+ganglia.seconds = 60
 ```
 
 ## Deploy
