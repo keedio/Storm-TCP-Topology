@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keedio.storm.topology.tcp</groupId>
     <artifactId>Storm-TCP-Topology</artifactId>
-    <version>2.1.7-SNAPSHOT</version>
+    <version>2.1.8-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
