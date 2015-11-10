@@ -58,7 +58,7 @@ public class StormTCPTopology {
 		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), topologyProperties.getKafkaSpoutParallelism());
 		builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
                 builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("FilterBolt");
-		builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterBolt");
+		builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterKeyBolt");
                 
 		return builder.createTopology();
 	}

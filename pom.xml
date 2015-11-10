@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keedio.storm.topology.tcp</groupId>
     <artifactId>Storm-TCP-Topology</artifactId>
-    <version>2.0.6-SNAPSHOT</version>
+    <version>2.1.7-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -18,14 +18,13 @@
         <dependency>
             <groupId>org.keedio.storm.bolt.filter</groupId>
             <artifactId>storm-filterregex-bolt</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.keedio</groupId>
             <artifactId>Storm-filterKey-bolt</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.4</version>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-core</artifactId>
