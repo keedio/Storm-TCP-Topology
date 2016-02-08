@@ -20,6 +20,7 @@ public class TopologyProperties {
     private String stormExecutionMode;
     private boolean kafkaStartFromBeginning;
     private String jsonFilter;
+    private boolean filterBoltEnabled, filterKeyBoltEnabled;
 
     public TopologyProperties(String fileName) {
 
@@ -50,6 +51,9 @@ public class TopologyProperties {
         filterBoltParallelism = Integer.parseInt(properties.getProperty("filter.bolt.paralellism", "1"));
         tcpBoltParallelism = Integer.parseInt(properties.getProperty("tcp.bolt.paralellism", "1"));
         filterkeyBoltParallelism = Integer.parseInt(properties.getProperty("filterkey.bolt.paralellism", "1"));
+        
+        filterBoltEnabled = Boolean.parseBoolean(properties.getProperty("filter.bolt.enabled", "false"));
+        filterKeyBoltEnabled = Boolean.parseBoolean(properties.getProperty("filterkey.bolt.enabled", "false"));
 
         kafkaTopic = properties.getProperty("kafka.topic");
         if (kafkaTopic == null) {
@@ -72,7 +76,8 @@ public class TopologyProperties {
         }
         stormExecutionMode = properties.getProperty("storm.execution.mode", "local");
         int stormWorkersNumber = Integer.parseInt(properties.getProperty("storm.workers.number", "1"));
-        int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism", "2"));
+        int maxTaskParallism = Integer.parseInt(properties.getProperty("storm.max.task.parallelism", "10"));
+        String numAckersExecutors = properties.getProperty("topology.ackers.executors");
 
         zookeeperHosts = properties.getProperty("zookeeper.hosts");
         if (zookeeperHosts == null) {
@@ -87,23 +92,17 @@ public class TopologyProperties {
         // How often a batch can be emitted in a Trident topology.
         stormConfig.put(Config.TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS, topologyBatchEmitMillis);
         stormConfig.setNumWorkers(stormWorkersNumber);
-		//stormConfig.setMaxTaskParallelism(maxTaskParallism);
-        // Storm cluster specific properties
+		stormConfig.setMaxTaskParallelism(maxTaskParallism);
+		if (numAckersExecutors != null)
+			stormConfig.setNumAckers(Integer.parseInt(numAckersExecutors));
+		
+		// Storm cluster specific properties
         stormConfig.put(Config.NIMBUS_HOST, nimbusHost);
         stormConfig.put(Config.NIMBUS_THRIFT_PORT, Integer.parseInt(nimbusPort));
         stormConfig.put(Config.STORM_ZOOKEEPER_PORT, parseZkPort(zookeeperHosts));
         stormConfig.put(Config.STORM_ZOOKEEPER_SERVERS, parseZkHosts(zookeeperHosts));
-		// Filter Messages Bolt properties
-        // TCP bolt connection properties
-        //stormConfig.put("filter.bolt.allow", properties.getProperty("filter.bolt.allow",""));
-        //stormConfig.put("filter.bolt.deny", properties.getProperty("filter.bolt.deny",""));
-        // TCP bolt connection properties
-        //stormConfig.put("tcp.bolt.host", properties.getProperty("tcp.bolt.host"));
-        //stormConfig.put("tcp.bolt.port", properties.getProperty("tcp.bolt.port"));
-        //stormConfig.put("metrics.reporter.yammer.facade..metric.bucket.seconds", properties.getProperty("metrics.reporter.yammer.facade..metric.bucket.seconds"));
-        //stormConfig.put("group.separator", properties.getProperty("group.separator"));
-        //stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
-        //stormConfig.put("storm.filter.json", properties.getProperty("storm.filter.json"));
+        
+        
         String tcpHost = properties.getProperty("tcp.bolt.host");
         String tcpPort = properties.getProperty("tcp.bolt.port");
         if (tcpHost == null || tcpPort == null) {
@@ -175,4 +174,12 @@ public class TopologyProperties {
     public int getFilterkeyBoltParallelism() {
         return this.filterkeyBoltParallelism;
     }
+
+	public boolean isFilterBoltEnabled() {
+		return filterBoltEnabled;
+	}
+	
+	public boolean isFilterKeyBoltEnabled() {
+		return filterKeyBoltEnabled;
+	}
 }
