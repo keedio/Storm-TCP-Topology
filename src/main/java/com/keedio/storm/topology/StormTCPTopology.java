@@ -1,9 +1,9 @@
 package com.keedio.storm.topology;
 
+import org.keedio.storm.bolt.JsonValidatorBolt;
 import org.keedio.storm.bolt.filter.FilterMessageBolt;
 import org.keedio.storm.bolt.tcp.TCPBolt;
 import org.keedio.storm.bolt.filterkey.FilterkeyBolt;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,26 +56,47 @@ public class StormTCPTopology {
 		
 		boolean filterBoltEnabled = topologyProperties.isFilterBoltEnabled();
 		boolean filterKeyBoltEnabled = topologyProperties.isFilterKeyBoltEnabled();
+		boolean jsonValidatorBoltEnabled = topologyProperties.isJsonValidatorBoltEnabled();
 		
 
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("KafkaSpout", new KafkaSpout(kafkaConfig), topologyProperties.getKafkaSpoutParallelism());
 		
-		if (filterBoltEnabled==true && filterKeyBoltEnabled==true){
+		if (filterBoltEnabled==true && filterKeyBoltEnabled==true && jsonValidatorBoltEnabled==false){
 			builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
 			builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("FilterBolt");
 			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterKeyBolt");		
 		}
-		if (filterBoltEnabled==true && filterKeyBoltEnabled==false){
+		else if (filterBoltEnabled==true && filterKeyBoltEnabled==false && jsonValidatorBoltEnabled==false){
 			builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
 			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterBolt");		
 		}
-		if (filterBoltEnabled==false && filterKeyBoltEnabled==true){
+		else if (filterBoltEnabled==false && filterKeyBoltEnabled==true && jsonValidatorBoltEnabled==false){
 			builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("KafkaSpout");
 			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("FilterKeyBolt");		
 		}
-		if (filterBoltEnabled==false && filterKeyBoltEnabled==false){	
+		else if (filterBoltEnabled==false && filterKeyBoltEnabled==false && jsonValidatorBoltEnabled==false){	
 			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("KafkaSpout");		
+		}
+		else if (filterBoltEnabled==true && filterKeyBoltEnabled==true && jsonValidatorBoltEnabled==true){
+			builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
+			builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("FilterBolt");
+			builder.setBolt("JsonValidatorBolt", new JsonValidatorBolt(), topologyProperties.getJsonValidatorBoltParallelism()).shuffleGrouping("FilterKeyBolt");
+			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("JsonValidatorBolt");		
+		}
+		else if (filterBoltEnabled==true && filterKeyBoltEnabled==false && jsonValidatorBoltEnabled==true){
+			builder.setBolt("FilterBolt", new FilterMessageBolt(), topologyProperties.getFilterBoltParallelism()).shuffleGrouping("KafkaSpout");
+			builder.setBolt("JsonValidatorBolt", new JsonValidatorBolt(), topologyProperties.getJsonValidatorBoltParallelism()).shuffleGrouping("FilterBolt");
+			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("JsonValidatorBolt");			
+		}
+		else if (filterBoltEnabled==false && filterKeyBoltEnabled==true && jsonValidatorBoltEnabled==true){
+			builder.setBolt("FilterKeyBolt", new FilterkeyBolt(), topologyProperties.getFilterkeyBoltParallelism()).shuffleGrouping("KafkaSpout");
+			builder.setBolt("JsonValidatorBolt", new JsonValidatorBolt(), topologyProperties.getJsonValidatorBoltParallelism()).shuffleGrouping("FilterKeyBolt");
+			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("JsonValidatorBolt");			
+		}
+		else if (filterBoltEnabled==false && filterKeyBoltEnabled==false && jsonValidatorBoltEnabled==true){	
+			builder.setBolt("JsonValidatorBolt", new JsonValidatorBolt(), topologyProperties.getJsonValidatorBoltParallelism()).shuffleGrouping("KafkaSpout");
+			builder.setBolt("TCPBolt", new TCPBolt(), topologyProperties.getTcpBoltParallelism()).shuffleGrouping("JsonValidatorBolt");			
 		}
                 
 		return builder.createTopology();

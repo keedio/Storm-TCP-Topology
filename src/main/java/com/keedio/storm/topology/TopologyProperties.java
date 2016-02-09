@@ -14,13 +14,12 @@ public class TopologyProperties {
     private String kafkaTopic;
     private String topologyName;
     private int localTimeExecution, kafkaSpoutParallelism, filterBoltParallelism,
-            tcpBoltParallelism, filterkeyBoltParallelism;
+            tcpBoltParallelism, filterkeyBoltParallelism, jsonValidatorBoltParallelism;
     private Config stormConfig;
     private String zookeeperHosts;
     private String stormExecutionMode;
     private boolean kafkaStartFromBeginning;
-    private String jsonFilter;
-    private boolean filterBoltEnabled, filterKeyBoltEnabled;
+    private boolean filterBoltEnabled, filterKeyBoltEnabled, jsonValidatorBoltEnabled;
 
     public TopologyProperties(String fileName) {
 
@@ -51,9 +50,11 @@ public class TopologyProperties {
         filterBoltParallelism = Integer.parseInt(properties.getProperty("filter.bolt.paralellism", "1"));
         tcpBoltParallelism = Integer.parseInt(properties.getProperty("tcp.bolt.paralellism", "1"));
         filterkeyBoltParallelism = Integer.parseInt(properties.getProperty("filterkey.bolt.paralellism", "1"));
+        jsonValidatorBoltParallelism = Integer.parseInt(properties.getProperty("jsonvalidator.bolt.paralellism", "1"));
         
         filterBoltEnabled = Boolean.parseBoolean(properties.getProperty("filter.bolt.enabled", "false"));
         filterKeyBoltEnabled = Boolean.parseBoolean(properties.getProperty("filterkey.bolt.enabled", "false"));
+        jsonValidatorBoltEnabled = Boolean.parseBoolean(properties.getProperty("jsonvalidator.bolt.enabled", "false"));
 
         kafkaTopic = properties.getProperty("kafka.topic");
         if (kafkaTopic == null) {
@@ -174,6 +175,10 @@ public class TopologyProperties {
     public int getFilterkeyBoltParallelism() {
         return this.filterkeyBoltParallelism;
     }
+    
+    public int getJsonValidatorBoltParallelism() {
+        return this.jsonValidatorBoltParallelism;
+    }
 
 	public boolean isFilterBoltEnabled() {
 		return filterBoltEnabled;
@@ -181,5 +186,9 @@ public class TopologyProperties {
 	
 	public boolean isFilterKeyBoltEnabled() {
 		return filterKeyBoltEnabled;
+	}
+	
+	public boolean isJsonValidatorBoltEnabled() {
+		return jsonValidatorBoltEnabled;
 	}
 }
